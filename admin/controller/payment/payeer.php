@@ -34,19 +34,11 @@ class ControllerPaymentPayeer extends Controller
 		$this->data['entry_status'] = $this->language->get('entry_status');
 		$this->data['entry_sort_order'] = $this->language->get('entry_sort_order');
 		$this->data['entry_title_pay_settings'] = $this->language->get('entry_title_pay_settings');
-		$this->data['entry_currency'] = $this->language->get('entry_currency');
+		$this->data['entry_order_desc'] = $this->language->get('entry_order_desc');
 		$this->data['entry_log'] = $this->language->get('entry_log');
-		$this->data['text_yes'] = $this->language->get('text_yes');
-		$this->data['text_no'] = $this->language->get('text_no');
 		$this->data['entry_title_url_settings'] = $this->language->get('entry_title_url_settings');
-		$this->data['entry_status_url'] = $this->language->get('entry_status_url');
-		$this->data['entry_success_url'] = $this->language->get('entry_success_url');
-		$this->data['entry_fail_url'] = $this->language->get('entry_fail_url');
 		$this->data['entry_list_ip'] = $this->language->get('entry_list_ip');
 		$this->data['entry_admin_email'] = $this->language->get('entry_admin_email');
-		$this->data['status_url'] = $this->language->get('status_url');
-		$this->data['success_url'] = $this->language->get('success_url');
-		$this->data['fail_url'] = $this->language->get('fail_url');
 
 		$this->data['button_save'] = $this->language->get('button_save');
 		$this->data['button_cancel'] = $this->language->get('button_cancel');
@@ -58,15 +50,6 @@ class ControllerPaymentPayeer extends Controller
 		else 
 		{
 			$this->data['error_warning'] = '';
-		}
-
-		if (isset($this->error['url'])) 
-		{
-			$this->data['error_url'] = $this->error['url'];
-		} 
-		else 
-		{
-			$this->data['error_url'] = '';
 		}
 
  		if (isset($this->error['merchant'])) 
@@ -113,11 +96,34 @@ class ControllerPaymentPayeer extends Controller
 		
 		if (isset($this->request->post['payeer_url']))
 		{
-			$this->data['payeer_url'] = $this->request->post['payeer_url'];
+			if ($this->request->post['payeer_url'] == '')
+			{
+				$this->data['payeer_url'] = '//payeer.com/merchant/';
+			}
+			else
+			{
+				$this->data['payeer_url'] = $this->request->post['payeer_url'];
+			}
+		} 
+		else
+		{
+			if ($this->config->get('payeer_url') == '')
+			{
+				$this->data['payeer_url'] = '//payeer.com/merchant/';
+			}
+			else
+			{
+				$this->data['payeer_url'] = $this->config->get('payeer_url');
+			}
+		}
+		
+		if (isset($this->request->post['payeer_order_desc']))
+		{
+			$this->data['payeer_order_desc'] = $this->request->post['payeer_order_desc'];
 		} 
 		else 
 		{
-			$this->data['payeer_url'] = $this->config->get('payeer_url');
+			$this->data['payeer_order_desc'] = $this->config->get('payeer_order_desc');
 		}
 		
 		if (isset($this->request->post['payeer_merchant']))
@@ -186,15 +192,6 @@ class ControllerPaymentPayeer extends Controller
 		
 		$this->data['currencies'] = $this->model_localisation_currency->getCurrencies();
 		
-		if (isset($this->request->post['payeer_currency_id'])) 
-		{
-			$this->data['payeer_currency_id'] = $this->request->post['payeer_currency_id'];
-		}
-		else 
-		{
-			$this->data['payeer_currency_id'] = $this->config->get('payeer_currency_id'); 
-		} 
-		
 		if (isset($this->request->post['payeer_log_value'])) 
 		{
 			$this->data['payeer_log_value'] = $this->request->post['payeer_log_value'];
@@ -236,11 +233,6 @@ class ControllerPaymentPayeer extends Controller
 		if (!$this->user->hasPermission('modify', 'payment/payeer'))
 		{
 			$this->error['warning'] = $this->language->get('error_permission');
-		}
-		
-		if (!$this->request->post['payeer_url']) 
-		{
-			$this->error['url'] = $this->language->get('error_url');
 		}
 		
 		if (!$this->request->post['payeer_merchant']) 

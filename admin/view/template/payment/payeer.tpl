@@ -61,11 +61,8 @@
 			<td colspan=2><? echo $entry_title_pay_settings; ?></td>
 		  </tr>
 		  <tr>
-            <td><span class="required">*</span> <? echo $entry_url; ?></td>
-            <td><input type="text" name="payeer_url" value="<? echo $payeer_url; ?>" />
-              <? if ($error_url) { ?>
-              <span class="error"><? echo $error_url; ?></span>
-              <? } ?></td>
+            <td><? echo $entry_url; ?></td>
+            <td><input type="text" name="payeer_url" value="<? echo $payeer_url; ?>" /></td>
           </tr>
           <tr>
             <td><span class="required">*</span> <? echo $entry_merchant; ?></td>
@@ -82,25 +79,12 @@
               <? } ?></td>
           </tr>
 		  <tr>
-            <td><? echo $entry_currency; ?></td>
-            <td><select name="payeer_currency_id">
-                <? foreach ($currencies as $currency) { ?>
-                <? if ($currency['currency_id'] == $payeer_currency_id) { ?>
-                <option value="<? echo $currency['currency_id']; ?>" selected="selected"><? echo $currency['code']; ?></option>
-                <? } else { ?>
-                <option value="<? echo $currency['currency_id']; ?>"><? echo $currency['code']; ?></option>
-                <? } ?>
-                <? } ?>
-              </select></td>
+            <td><? echo $entry_order_desc; ?></td>
+            <td><input type="text" name="payeer_order_desc" value="<? echo $payeer_order_desc; ?>" size="60"/></td>
           </tr>
 		  <tr>
             <td><? echo $entry_log; ?></td>
-            <td><select name="payeer_log_value">
-				<option value="1" 
-					<? if ($payeer_log_value == 1) {?> selected="selected" <?}?>><? echo $text_yes; ?></option>
-				<option value="2" 
-					<? if ($payeer_log_value == 2) {?> selected="selected" <?}?>><? echo $text_no; ?></option>
-				</select></td>
+            <td><input type="text" name="payeer_log_value" value="<? echo $payeer_log_value; ?>" size="60"/></td>
           </tr>
 		  <tr>
             <td><? echo $entry_list_ip; ?></td>
@@ -109,21 +93,6 @@
 		  <tr>
             <td><? echo $entry_admin_email; ?></td>
             <td><input type="text" name="admin_email" value="<? echo $admin_email; ?>" size="60"/></td>
-          </tr>
-		  <tr>
-			<td colspan=2><? echo $entry_title_url_settings; ?></td>
-		  </tr>
-		  <tr>
-            <td><? echo $entry_status_url; ?></td>
-			<td><? echo $status_url; ?></td>
-          </tr>
-		  <tr>
-            <td><? echo $entry_success_url; ?></td>
-            <td><? echo $success_url; ?></td>
-          </tr>
-		  <tr>
-            <td><? echo $entry_fail_url; ?></td>
-            <td><? echo $fail_url; ?></td>
           </tr>
         </table>
       </form>

@@ -17,23 +17,13 @@ $_['entry_geo_zone']     = 'Geo Zone:';
 $_['entry_status']       = 'Status:';
 $_['entry_sort_order']   = 'Sort Order:';
 $_['entry_title_pay_settings']   = '<b>Settings to configure the reception of payments through Payeer</b>';
-$_['entry_currency'] = 'Currency:<br/><span class="help">Currency where the store transfers the amount of the payment to the payment gateway "Payeer"</span>';
-$_['entry_log'] = 'Log:<br/><span class="help">Log requests from Payeer is saved in the file: system/logs/shoputils_payeer.txt</span>';
-$_['entry_title_url_settings'] = '<b>Enter <a href="http://www.payeer.com/account/">account Payeer</a> (the"Account -> My store -> Modify) the following 3 URL:</b>';
-
+$_['entry_log'] = 'The path to the log file for payments via Payeer (for example, /payeer_orders.log)<br/><span class="help">If path is not specified, the log is not written</span>';
+$_['entry_order_desc'] = 'Comment for payment<br/><span class="help">Explanation of payment</span>';
 $_['entry_list_ip'] = 'List IP:';
 $_['entry_admin_email'] = 'E-mail for notifications about errors:';
-$_['entry_status_url']   = 'Status URL:';
-$_['entry_success_url']   = 'Success URL:';
-$_['entry_fail_url']   = 'Fail URL:';
-
-$_['status_url']	 = 'http://store.devellight.tmweb.ru/?route=payment/payeer/status';
-$_['success_url']  	 = 'http://store.devellight.tmweb.ru/?route=payment/payeer/success';
-$_['fail_url']  	 = 'http://store.devellight.tmweb.ru/?route=payment/payeer/fail';
 
 // Error
 $_['error_permission']   = 'Warning: You do not have permission to modify payment payeer!';
-$_['error_url']    		 = 'You must specify the URL of the merchant!';
 $_['error_merchant']     = 'Merchant ID Required!';
 $_['error_security']     = 'Security Code Required!';
 ?>
