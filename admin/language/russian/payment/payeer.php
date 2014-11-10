@@ -17,22 +17,13 @@ $_['entry_geo_zone']     = 'Географическая зона:';
 $_['entry_status']       = 'Статус:';
 $_['entry_sort_order']   = 'Порядок сортировки:';
 $_['entry_title_pay_settings']   = '<b>Параметры для настройки приема платежей через Payeer</b>';
-$_['entry_currency'] = 'Валюта магазина:<br/><span class="help">Валюта, в которой магазин передает сумму платежа на платежный шлюз "Payeer"</span>';
-$_['entry_log'] = 'Журнал:<br/><span class="help">Журнал запросов от Payeer сохраняется в файле: system/logs/shoputils_payeer.txt</span>';
-$_['entry_title_url_settings'] = '<b>Укажите в <a href="http://www.payeer.com/account/">аккаунте Payeer</a> ("Аккаунт -> Мой магазин -> Изменить") следующие 3 URL-а:</b>';
-$_['entry_status_url']   = 'Status URL:';
-$_['entry_success_url']   = 'Success URL:';
-$_['entry_fail_url']   = 'Fail URL:';
-
+$_['entry_log'] = 'Путь до файла для журнала оплат через Payeer (например, /payeer_orders.log)<br/><span class="help">Если путь не указан, то журнал не записывается</span>';
+$_['entry_order_desc'] = 'Комментарий к оплате<br/><span class="help">Пояснение оплаты заказа</span>';
 $_['entry_list_ip'] = 'Список IP:';
 $_['entry_admin_email'] = 'E-mail для оповещения об ошибках:';
-$_['status_url']	 = 'http://store.devellight.tmweb.ru/?route=payment/payeer/status';
-$_['success_url']  	 = 'http://store.devellight.tmweb.ru/?route=payment/payeer/success';
-$_['fail_url']  	 = 'http://store.devellight.tmweb.ru/?route=payment/payeer/fail';
 
 // Error
 $_['error_permission']   = 'У Вас нет прав для управления этим модулем!';
-$_['error_url']    		 = 'Необходимо указать URL мерчанта!';
 $_['error_merchant']     = 'Необходимо указать идентификатор магазина!';
 $_['error_security']     = 'Необходимо указать секретный код!';
 ?>

@@ -10,7 +10,7 @@ class ModelPaymentPayeer extends Model
 		if ($this->config->get('payeer_total') > 0 && $this->config->get('payeer_total') > $total) 
 		{
 			$status = false;
-		} 
+		}
 		elseif (!$this->config->get('payeer_geo_zone_id')) 
 		{
 			$status = true;
