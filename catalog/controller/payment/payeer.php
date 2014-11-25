@@ -21,13 +21,16 @@ class ControllerPaymentPayeer extends Controller
 		$this->data['m_orderid'] = $order_id;
 		$this->data['m_amount'] = $this->currency->format($order_info['total'], $order_info['currency_code'], $order_info['currency_value'], false);
 		
-		if (strtoupper($order_info['currency_code']) == 'RUR')
+		$cur = $this->config->get('payeer_currency_id');
+		
+		switch ($cur)
 		{
-			$this->data['m_curr'] = 'RUB';
-		}
-		else
-		{
-			$this->data['m_curr'] = $order_info['currency_code'];
+			case 1:
+				$this->data['m_curr'] = 'RUB';
+			case 2:
+				$this->data['m_curr'] = 'USD';
+			case 3:
+				$this->data['m_curr'] = 'EUR';
 		}
 		
 		$this->data['m_desc'] = base64_encode($this->config->get('payeer_order_desc'));
