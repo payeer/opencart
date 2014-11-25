@@ -27,10 +27,13 @@ class ControllerPaymentPayeer extends Controller
 		{
 			case 1:
 				$this->data['m_curr'] = 'RUB';
+				break;
 			case 2:
 				$this->data['m_curr'] = 'USD';
+				break;
 			case 3:
 				$this->data['m_curr'] = 'EUR';
+				break;
 		}
 		
 		$this->data['m_desc'] = base64_encode($this->config->get('payeer_order_desc'));
