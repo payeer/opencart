@@ -5,5 +5,5 @@
 <input type="hidden" name="m_curr" value="<?php echo $m_curr; ?>">
 <input type="hidden" name="m_desc" value="<?php echo $m_desc; ?>">
 <input type="hidden" name="m_sign" value="<?php echo $sign; ?>">
-<input type="submit" name="m_process" value="оплатить" class="button"/>
+<input type="submit" name="m_process" value="Оплатить" class="button"/>
 </form>
