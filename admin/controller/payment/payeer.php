@@ -27,14 +27,12 @@ class ControllerPaymentPayeer extends Controller
 		$this->data['entry_url'] = $this->language->get('entry_url');
 		$this->data['entry_merchant'] = $this->language->get('entry_merchant');
 		$this->data['entry_security'] = $this->language->get('entry_security');
-		$this->data['entry_callback'] = $this->language->get('entry_callback');
 		$this->data['entry_total'] = $this->language->get('entry_total');	
 		$this->data['entry_order_status'] = $this->language->get('entry_order_status');		
 		$this->data['entry_geo_zone'] = $this->language->get('entry_geo_zone');
 		$this->data['entry_status'] = $this->language->get('entry_status');
 		$this->data['entry_sort_order'] = $this->language->get('entry_sort_order');
 		$this->data['entry_title_pay_settings'] = $this->language->get('entry_title_pay_settings');
-		$this->data['entry_order_desc'] = $this->language->get('entry_order_desc');
 		$this->data['entry_log'] = $this->language->get('entry_log');
 		$this->data['entry_title_url_settings'] = $this->language->get('entry_title_url_settings');
 		$this->data['entry_list_ip'] = $this->language->get('entry_list_ip');
@@ -89,16 +87,15 @@ class ControllerPaymentPayeer extends Controller
 			'href'      => $this->url->link('payment/payeer', 'token=' . $this->session->data['token'], 'SSL'),
       		'separator' => ' :: '
    		);
-				
+
 		$this->data['action'] = $this->url->link('payment/payeer', 'token=' . $this->session->data['token'], 'SSL');
-		
 		$this->data['cancel'] = $this->url->link('extension/payment', 'token=' . $this->session->data['token'], 'SSL');
 		
 		if (isset($this->request->post['payeer_url']))
 		{
 			if ($this->request->post['payeer_url'] == '')
 			{
-				$this->data['payeer_url'] = '//payeer.com/merchant/';
+				$this->data['payeer_url'] = 'https://payeer.com/merchant/';
 			}
 			else
 			{
@@ -109,21 +106,12 @@ class ControllerPaymentPayeer extends Controller
 		{
 			if ($this->config->get('payeer_url') == '')
 			{
-				$this->data['payeer_url'] = '//payeer.com/merchant/';
+				$this->data['payeer_url'] = 'https://payeer.com/merchant/';
 			}
 			else
 			{
 				$this->data['payeer_url'] = $this->config->get('payeer_url');
 			}
-		}
-		
-		if (isset($this->request->post['payeer_order_desc']))
-		{
-			$this->data['payeer_order_desc'] = $this->request->post['payeer_order_desc'];
-		} 
-		else 
-		{
-			$this->data['payeer_order_desc'] = $this->config->get('payeer_order_desc');
 		}
 		
 		if (isset($this->request->post['payeer_merchant']))
@@ -143,7 +131,7 @@ class ControllerPaymentPayeer extends Controller
 		{
 			$this->data['payeer_security'] = $this->config->get('payeer_security');
 		}
-				
+
 		if (isset($this->request->post['payeer_order_status_id'])) 
 		{
 			$this->data['payeer_order_status_id'] = $this->request->post['payeer_order_status_id'];
@@ -167,7 +155,6 @@ class ControllerPaymentPayeer extends Controller
 		} 
 
 		$this->load->model('localisation/geo_zone');
-										
 		$this->data['geo_zones'] = $this->model_localisation_geo_zone->getGeoZones();
 		
 		if (isset($this->request->post['payeer_status'])) 
@@ -189,7 +176,6 @@ class ControllerPaymentPayeer extends Controller
 		}
 		
 		$this->load->model('localisation/currency');
-		
 		$this->data['currencies'] = $this->model_localisation_currency->getCurrencies();
 		
 		if (isset($this->request->post['payeer_log_value'])) 
@@ -224,7 +210,7 @@ class ControllerPaymentPayeer extends Controller
 			'common/header',
 			'common/footer'
 		);
-				
+		
 		$this->response->setOutput($this->render());
 	}
 

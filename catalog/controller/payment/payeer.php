@@ -4,38 +4,26 @@ class ControllerPaymentPayeer extends Controller
 	protected function index() 
 	{
 		$this->data['button_confirm'] = $this->language->get('button_confirm');
-
 		$this->load->model('checkout/order');
-		
 		$order_id = $this->session->data['order_id'];
-		
 		$order_info = $this->model_checkout_order->getOrder($order_id);
-		
 		$this->model_checkout_order->confirm($order_id, 2);
-		
 		$this->data['action'] = $this->config->get('payeer_url');
-
 		$this->data['m_shop'] = $this->config->get('payeer_merchant');
-
-		$m_key = $this->config->get('payeer_security');
 		$this->data['m_orderid'] = $order_id;
 		$this->data['m_amount'] = $this->currency->format($order_info['total'], $order_info['currency_code'], $order_info['currency_value'], false);
-		
+		$this->data['m_amount'] = number_format($this->data['m_amount'], 2, '.', '');
 		$this->data['m_curr'] = strtoupper($order_info['currency_code']);
+		$this->data['m_curr'] = $this->data['m_curr'] == 'RUR' ? 'RUB' : $this->data['m_curr'];
+		$this->data['m_desc'] = base64_encode($order_info['comment']);
 		
-		if ($this->data['m_curr'] == 'RUR')
-		{
-			$this->data['m_curr'] = 'RUB';
-		}
-		
-		$this->data['m_desc'] = base64_encode($this->config->get('payeer_order_desc'));
 		$arHash = array(
 			$this->data['m_shop'],
 			$this->data['m_orderid'],
 			$this->data['m_amount'],
 			$this->data['m_curr'],
 			$this->data['m_desc'],
-			$m_key
+			$this->config->get('payeer_security')
 		);
 		
 		$sign = strtoupper(hash('sha256', implode(":", $arHash)));
@@ -55,68 +43,28 @@ class ControllerPaymentPayeer extends Controller
 	
 	public function status() 
 	{
-		if (isset($_POST["m_operation_id"]) && isset($_POST["m_sign"]))
+		$request = $this->request->post;
+		
+		if (isset($request["m_operation_id"]) && isset($request["m_sign"]))
 		{
-			$m_key = $this->config->get('payeer_security');
-			$arHash = array(
-				$_POST['m_operation_id'],
-				$_POST['m_operation_ps'],
-				$_POST['m_operation_date'],
-				$_POST['m_operation_pay_date'],
-				$_POST['m_shop'],
-				$_POST['m_orderid'],
-				$_POST['m_amount'],
-				$_POST['m_curr'],
-				$_POST['m_desc'],
-				$_POST['m_status'],
-				$m_key
-			);
-			$sign_hash = strtoupper(hash('sha256', implode(":", $arHash)));
+			$err = false;
+			$message = '';
 			
-			// проверка принадлежности ip списку доверенных ip
-			$list_ip_str = str_replace(' ', '', $this->config->get('list_ip'));
+			// запись логов
 			
-			if ($list_ip_str != '') 
-			{
-				$list_ip = explode(',', $list_ip_str);
-				$this_ip = $_SERVER['REMOTE_ADDR'];
-				$this_ip_field = explode('.', $this_ip);
-				$list_ip_field = array();
-				$i = 0;
-				$valid_ip = FALSE;
-				foreach ($list_ip as $ip)
-				{
-					$ip_field[$i] = explode('.', $ip);
-					if ((($this_ip_field[0] ==  $ip_field[$i][0]) or ($ip_field[$i][0] == '*')) and
-						(($this_ip_field[1] ==  $ip_field[$i][1]) or ($ip_field[$i][1] == '*')) and
-						(($this_ip_field[2] ==  $ip_field[$i][2]) or ($ip_field[$i][2] == '*')) and
-						(($this_ip_field[3] ==  $ip_field[$i][3]) or ($ip_field[$i][3] == '*')))
-						{
-							$valid_ip = TRUE;
-							break;
-						}
-					$i++;
-				}
-			}
-			else
-			{
-				$valid_ip = TRUE;
-			}
-			
-			// запись в логи если требуется
 			$log_text = 
-				"--------------------------------------------------------\n".
-				"operation id		" . $_POST["m_operation_id"] . "\n".
-				"operation ps		" . $_POST["m_operation_ps"] . "\n".
-				"operation date		" . $_POST["m_operation_date"] . "\n".
-				"operation pay date	" . $_POST["m_operation_pay_date"] . "\n".
-				"shop				" . $_POST["m_shop"] . "\n".
-				"order id			" . $_POST["m_orderid"] . "\n".
-				"amount				" . $_POST["m_amount"] . "\n".
-				"currency			" . $_POST["m_curr"] . "\n".
-				"description		" . base64_decode($_POST["m_desc"]) . "\n".
-				"status				" . $_POST["m_status"] . "\n".
-				"sign				" . $_POST["m_sign"] . "\n\n";
+			"--------------------------------------------------------\n" .
+			"operation id		" . $request['m_operation_id'] . "\n" .
+			"operation ps		" . $request['m_operation_ps'] . "\n" .
+			"operation date		" . $request['m_operation_date'] . "\n" .
+			"operation pay date	" . $request['m_operation_pay_date'] . "\n" .
+			"shop				" . $request['m_shop'] . "\n" .
+			"order id			" . $request['m_orderid'] . "\n" .
+			"amount				" . $request['m_amount'] . "\n" .
+			"currency			" . $request['m_curr'] . "\n" .
+			"description		" . base64_decode($request['m_desc']) . "\n" .
+			"status				" . $request['m_status'] . "\n" .
+			"sign				" . $request['m_sign'] . "\n\n";
 			
 			$log_file = $this->config->get('payeer_log_value');
 			
@@ -124,64 +72,149 @@ class ControllerPaymentPayeer extends Controller
 			{
 				file_put_contents($_SERVER['DOCUMENT_ROOT'] . $log_file, $log_text, FILE_APPEND);
 			}
+
+			// проверка цифровой подписи и ip
+
+			$sign_hash = strtoupper(hash('sha256', implode(":", array(
+				$request['m_operation_id'],
+				$request['m_operation_ps'],
+				$request['m_operation_date'],
+				$request['m_operation_pay_date'],
+				$request['m_shop'],
+				$request['m_orderid'],
+				$request['m_amount'],
+				$request['m_curr'],
+				$request['m_desc'],
+				$request['m_status'],
+				$this->config->get('payeer_security')
+			))));
 			
-			$order_id = $_POST['m_orderid'];
-			$this->load->model('checkout/order');
-			$order_info = $this->model_checkout_order->getOrder($order_id);
+			$valid_ip = true;
+			$sIP = str_replace(' ', '', $this->config->get('list_ip'));
 			
-			// проверка цифровой подписи и ip сервера
-			if ($_POST["m_sign"] == $sign_hash && $_POST['m_status'] == "success" && $valid_ip)
+			if (!empty($sIP))
 			{
-				if( $order_info['order_status_id'] != $this->config->get('payeer_order_status_id')) 
+				$arrIP = explode('.', $_SERVER['REMOTE_ADDR']);
+				if (!preg_match('/(^|,)(' . $arrIP[0] . '|\*{1})(\.)' .
+				'(' . $arrIP[1] . '|\*{1})(\.)' .
+				'(' . $arrIP[2] . '|\*{1})(\.)' .
+				'(' . $arrIP[3] . '|\*{1})($|,)/', $sIP))
 				{
-					$this->model_checkout_order->update($order_id, $this->config->get('payeer_order_status_id'), 'Payeer', TRUE);
+					$valid_ip = false;
 				}
+			}
+			
+			if (!$valid_ip)
+			{
+				$message .= " - the ip address of the server is not trusted\n" .
+				"   trusted ip: " . $sIP . "\n" .
+				"   ip of the current server: " . $_SERVER['REMOTE_ADDR'] . "\n";
+				$err = true;
+			}
+
+			if ($request['m_sign'] != $sign_hash)
+			{
+				$message .= " - do not match the digital signature\n";
+				$err = true;
+			}
+
+			if (!$err)
+			{
+				// загрузка заказа
 				
-				exit ($order_id . '|success');
+				$this->load->model('checkout/order');
+				$order = $this->model_checkout_order->getOrder($request['m_orderid']);
+				
+				if (!$order)
+				{
+					$message .= " - undefined order id\n";
+					$err = true;
+				}
+				else
+				{
+					$order_curr = ($order['currency_code'] == 'RUR') ? 'RUB' : $order['currency_code'];
+					$order_amount = number_format($order['total'], 2, '.', '');
+					
+					// проверка суммы и валюты
+				
+					if ($request['m_amount'] != $order_amount)
+					{
+						$message .= " - wrong amount\n";
+						$err = true;
+					}
+
+					if ($request['m_curr'] != $order_curr)
+					{
+						$message .= " - wrong currency\n";
+						$err = true;
+					}
+					
+					// проверка статуса
+					
+					if (!$err)
+					{
+						switch ($request['m_status'])
+						{
+							case 'success':
+								if ($order['order_status_id'] !== $this->config->get('payeer_order_status_id'))
+								{
+									$this->model_checkout_order->update($request['m_orderid'], $this->config->get('payeer_order_status_id'), 'Payeer', TRUE);
+								}
+								break;
+								
+							default:
+								$message .= " - the payment status is not success\n";
+								$this->model_checkout_order->update($request['m_orderid'], 7, 'Payeer', TRUE);
+								$err = true;
+								break;
+						}
+					}
+				}
+			}
+
+			$this->data['order_id'] = $request['m_orderid'];
+			
+			if ($err)
+			{
+				$this->data['order_status'] = 'error';
+				$to = $this->config->get('admin_email');
+
+				if (!empty($to))
+				{
+					$message = "Failed to make the payment through the system Payeer for the following reasons:\n\n" . $message . "\n" . $log_text;
+					$headers = "From: no-reply@" . $_SERVER['HTTP_HOST'] . "\r\n" . 
+					"Content-type: text/plain; charset=utf-8 \r\n";
+					mail($to, 'Payment error', $message, $headers);
+				}
 			}
 			else
-			{	
-				$this->model_checkout_order->update($order_id, 7, 'Payeer', TRUE);
-				$to = $this->config->get('admin_email');
-				$subject = "Payment error";
-				$message = "Failed to make the payment through the system Payeer for the following reasons:\n\n";
-				
-				if ($_POST["m_sign"] != $sign_hash)
-				{
-					$message .= " - Do not match the digital signature\n";
-				}
-				
-				if ($_POST['m_status'] != "success")
-				{
-					$message .= " - The payment status is not success\n";
-				}
-				
-				if (!$valid_ip)
-				{
-					$message .= " - the ip address of the server is not trusted\n";
-					$message .= "   trusted ip: " . $this->config->get('list_ip') . "\n";
-					$message .= "   ip of the current server: " . $_SERVER['REMOTE_ADDR'] . "\n";
-				}
-				
-				$message .= "\n" . $log_text;
-				$headers = "From: no-reply@" . $_SERVER['HTTP_SERVER']."\r\nContent-type: text/plain; charset=utf-8 \r\n";
-				mail($to, $subject, $message, $headers);
-				
-				exit ($order_id . '|error');
+			{
+				$this->data['order_status'] = 'success';
 			}
+	
+			if (file_exists(DIR_TEMPLATE . $this->config->get('config_template') . '/template/payment/payeer_status.tpl')) 
+			{
+				$this->template = $this->config->get('config_template') . '/template/payment/payeer_status.tpl';
+			}
+			else 
+			{
+				$this->template = 'default/template/payment/payeer_status.tpl';
+			}
+			
+			$this->response->setOutput(preg_replace('/[^a-zA-Z0-9_-|]/', '', substr($this->render(), 0, 39)));
 		}
 	}
 	
 	public function fail()
 	{
 		$this->redirect(HTTP_SERVER . 'index.php?route=checkout/checkout');
-		return TRUE;
+		return true;
 	}
 	
 	public function success()
 	{
 		$this->redirect(HTTP_SERVER . 'index.php?route=checkout/success');
-		return TRUE;
+		return true;
 	}
 }
 ?>

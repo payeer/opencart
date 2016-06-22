@@ -79,10 +79,6 @@
               <?php } ?></td>
           </tr>
 		  <tr>
-            <td><?php echo $entry_order_desc; ?></td>
-            <td><input type="text" name="payeer_order_desc" value="<?php echo $payeer_order_desc; ?>" size="60"/></td>
-          </tr>
-		  <tr>
             <td><?php echo $entry_log; ?></td>
             <td><input type="text" name="payeer_log_value" value="<?php echo $payeer_log_value; ?>" size="60"/></td>
           </tr>
